@@ -4,7 +4,7 @@ Spring Boot REST API backend for Golden Hive application.
 
 ## Prerequisites
 
-- Java 17+
+- Java 21+
 - Maven 3.9+
 - Docker & Docker Compose (for containerized deployment)
 
@@ -87,7 +87,7 @@ Default configuration in `application.properties`:
 
 Multi-stage Dockerfile that:
 1. Builds the JAR using Maven
-2. Runs the JAR with OpenJDK 17
+2. Runs the JAR with OpenJDK 21
 
 ## License
 
