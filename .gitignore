@@ -1,0 +1,26 @@
+# Build files
+target/
+.classpath
+.project
+.settings/
+
+# IDE
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Dependencies
+node_modules/
+.env
+.env.local
+
+# Logs
+*.log
