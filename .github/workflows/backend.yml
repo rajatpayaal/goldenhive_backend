@@ -7,6 +7,7 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    environment: secrets
 
     steps:
       - name: Checkout
@@ -58,4 +59,4 @@ jobs:
 
       - name: Skip Docker Publish (Secrets Missing)
         if: ${{ steps.docker_secrets.outputs.enabled != 'true' }}
-        run: echo "Docker publish skipped because DOCKER_USERNAME or DOCKER_TOKEN is not set in repository secrets."
+        run: echo "Docker publish skipped because DOCKER_USERNAME or DOCKER_TOKEN is not available in the selected GitHub environment/repository secrets."
