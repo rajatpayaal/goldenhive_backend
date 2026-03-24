@@ -2,6 +2,9 @@ services:
   - type: web
     name: goldenhive-backend
     runtime: docker
+    rootDir: .
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     plan: free
     autoDeploy: true
     healthCheckPath: /actuator/health
