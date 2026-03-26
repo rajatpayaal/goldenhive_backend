@@ -4,12 +4,18 @@ import com.goldenhive.backend.dto.BookingDTO;
 import com.goldenhive.backend.dto.CreateBookingRequest;
 import com.goldenhive.backend.dto.SelectedActivityDTO;
 import com.goldenhive.backend.entity.Booking;
-import com.goldenhive.backend.entity.SelectedActivity;
+import com.goldenhive.backend.exception.NotFoundException;
+import com.goldenhive.backend.exception.UnauthorizedException;
 import com.goldenhive.backend.enums.BookingStatus;
+import com.goldenhive.backend.factory.BookingFactory;
+import com.goldenhive.backend.factory.StatusFactory;
 import com.goldenhive.backend.iservice.IBookingService;
 import com.goldenhive.backend.iservice.ICartService;
+import com.goldenhive.backend.iservice.IEmailService;
+import com.goldenhive.backend.iservice.IPdfService;
 import com.goldenhive.backend.repository.BookingRepository;
 import com.goldenhive.backend.repository.CartRepository;
+import com.goldenhive.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +34,11 @@ public class BookingServiceImpl implements IBookingService {
     private final BookingRepository bookingRepository;
     private final CartRepository cartRepository;
     private final ICartService cartService;
+    private final BookingFactory bookingFactory;
+    private final StatusFactory statusFactory;
+    private final UserRepository userRepository;
+    private final IEmailService emailService;
+    private final IPdfService pdfService;
     
     @Override
     public BookingDTO createBookingFromCart(CreateBookingRequest request) {
@@ -35,26 +46,15 @@ public class BookingServiceImpl implements IBookingService {
         
         // Fetch cart
         var cart = cartRepository.findById(request.getCartId())
-                .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + request.getCartId()));
+                .orElseThrow(() -> new NotFoundException("Cart not found with ID: " + request.getCartId()));
         
         // Validate user
         if (!cart.getUserId().equals(request.getUserId())) {
-            throw new RuntimeException("Cart does not belong to this user");
+            throw new UnauthorizedException("Cart does not belong to this user");
         }
         
-        // Create booking
-        Booking booking = new Booking();
-        booking.setUserId(request.getUserId());
-        booking.setCartId(request.getCartId());
-        booking.setPackageId(cart.getPackageId());
-        booking.setSelectedActivities(cart.getSelectedActivities());
-        booking.setTotalPrice(cart.getTotalPrice());
-        booking.setTravelDate(request.getTravelDate());
-        booking.setTravelers(request.getTravelers());
-        booking.setStatus(BookingStatus.REQUESTED);
-        booking.setNotes(new ArrayList<>());
-        booking.setCreatedAt(LocalDateTime.now());
-        booking.setUpdatedAt(LocalDateTime.now());
+        Booking booking = bookingFactory.createBookingFromCart(cart, request);
+        bookingFactory.validateBooking(booking);
         
         Booking savedBooking = bookingRepository.save(booking);
         log.info("Booking created with ID: {}", savedBooking.getBookingId());
@@ -62,8 +62,12 @@ public class BookingServiceImpl implements IBookingService {
         // Clear cart after booking
         cartRepository.deleteById(request.getCartId());
         log.info("Cart cleared after booking");
-        
-        return mapToDTO(savedBooking);
+
+        BookingDTO bookingDTO = mapToDTO(savedBooking);
+        userRepository.findById(savedBooking.getUserId())
+                .ifPresent(user -> emailService.sendBookingConfirmation(user.getEmail(), bookingDTO, pdfService.generateBookingSummary(bookingDTO)));
+        emailService.sendAdminBookingAlert(bookingDTO);
+        return bookingDTO;
     }
     
     @Override
@@ -113,9 +117,9 @@ public class BookingServiceImpl implements IBookingService {
         log.info("Updating booking status - ID: {}, NewStatus: {}", bookingId, newStatus);
         
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Booking not found with ID: " + bookingId));
         
-        booking.setStatus(newStatus);
+        booking.setStatus(statusFactory.transitionStatus(booking.getStatus(), newStatus));
         booking.setUpdatedAt(LocalDateTime.now());
         
         Booking updatedBooking = bookingRepository.save(booking);
@@ -129,7 +133,7 @@ public class BookingServiceImpl implements IBookingService {
         log.info("Adding note to booking - ID: {}", bookingId);
         
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Booking not found with ID: " + bookingId));
         
         if (booking.getNotes() == null) {
             booking.setNotes(new ArrayList<>());
@@ -149,7 +153,7 @@ public class BookingServiceImpl implements IBookingService {
         log.info("Setting follow-up date - ID: {}, Date: {}", bookingId, followUpDate);
         
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Booking not found with ID: " + bookingId));
         
         booking.setFollowUpDate(followUpDate.atStartOfDay());
         booking.setUpdatedAt(LocalDateTime.now());
@@ -183,7 +187,7 @@ public class BookingServiceImpl implements IBookingService {
         log.info("Cancelling booking with ID: {}", bookingId);
         
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Booking not found with ID: " + bookingId));
         
         booking.setStatus(BookingStatus.CLOSED);
         booking.setUpdatedAt(LocalDateTime.now());

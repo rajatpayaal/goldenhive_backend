@@ -1,0 +1,65 @@
+{
+  "collection": "packages",
+  "validator": {
+    "$jsonSchema": {
+      "bsonType": "object",
+      "required": [
+        "name",
+        "slug",
+        "destination",
+        "duration",
+        "basePrice",
+        "customizable",
+        "limitedOffer",
+        "meta"
+      ],
+      "properties": {
+        "name": { "bsonType": "string", "description": "Package name is required" },
+        "slug": { "bsonType": "string", "description": "SEO slug is required" },
+        "destination": { "bsonType": "string" },
+        "duration": { "bsonType": "int", "minimum": 1 },
+        "basePrice": { "bsonType": ["double", "int", "long", "decimal"], "minimum": 0 },
+        "images": {
+          "bsonType": "array",
+          "items": {
+            "bsonType": "object",
+            "required": ["url", "isPrimary"],
+            "properties": {
+              "url": { "bsonType": "string" },
+              "isPrimary": { "bsonType": "bool" }
+            }
+          }
+        },
+        "inclusions": { "bsonType": "array", "items": { "bsonType": "string" } },
+        "exclusions": { "bsonType": "array", "items": { "bsonType": "string" } },
+        "itinerary": {
+          "bsonType": "array",
+          "items": {
+            "bsonType": "object",
+            "required": ["day", "title"],
+            "properties": {
+              "day": { "bsonType": "int", "minimum": 1 },
+              "title": { "bsonType": "string" },
+              "description": { "bsonType": "string" },
+              "location": { "bsonType": "string" }
+            }
+          }
+        },
+        "highlights": { "bsonType": "array", "items": { "bsonType": "string" } },
+        "customizable": { "bsonType": "bool" },
+        "whatsappContact": { "bsonType": "string" },
+        "popularTag": { "bsonType": "string" },
+        "limitedOffer": { "bsonType": "bool" },
+        "meta": {
+          "bsonType": "object",
+          "required": ["createdAt", "updatedAt", "status"],
+          "properties": {
+            "createdAt": { "bsonType": "date" },
+            "updatedAt": { "bsonType": "date" },
+            "status": { "enum": ["ACTIVE", "INACTIVE"] }
+          }
+        }
+      }
+    }
+  }
+}

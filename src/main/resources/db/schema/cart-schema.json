@@ -1,0 +1,28 @@
+{
+  "collection": "carts",
+  "validator": {
+    "$jsonSchema": {
+      "bsonType": "object",
+      "required": ["userId", "packageId", "selectedActivities", "totalPrice", "createdAt"],
+      "properties": {
+        "userId": { "bsonType": "string" },
+        "packageId": { "bsonType": "string" },
+        "selectedActivities": {
+          "bsonType": "array",
+          "items": {
+            "bsonType": "object",
+            "required": ["activityId"],
+            "properties": {
+              "activityId": { "bsonType": "string" },
+              "activityName": { "bsonType": "string" },
+              "price": { "bsonType": ["double", "int", "long", "decimal"], "minimum": 0 },
+              "discountedPrice": { "bsonType": ["double", "int", "long", "decimal"], "minimum": 0 }
+            }
+          }
+        },
+        "totalPrice": { "bsonType": ["double", "int", "long", "decimal"], "minimum": 0 },
+        "createdAt": { "bsonType": "date" }
+      }
+    }
+  }
+}

@@ -6,11 +6,11 @@ import com.goldenhive.backend.entity.Booking;
 import com.goldenhive.backend.entity.Cart;
 import com.goldenhive.backend.enums.BookingStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Factory;
+import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-@Factory
+@Component
 @Slf4j
 public class BookingFactory {
     

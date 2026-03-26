@@ -4,9 +4,9 @@ import com.goldenhive.backend.notification.impl.EmailNotification;
 import com.goldenhive.backend.notification.impl.WhatsAppNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Factory;
+import org.springframework.stereotype.Component;
 
-@Factory
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationFactory {
