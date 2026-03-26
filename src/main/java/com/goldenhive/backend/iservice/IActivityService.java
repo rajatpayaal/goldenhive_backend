@@ -1,6 +1,7 @@
 package com.goldenhive.backend.iservice;
 
 import com.goldenhive.backend.dto.ActivityDTO;
+import com.goldenhive.backend.dto.CreateActivityFormRequest;
 import com.goldenhive.backend.dto.CreateActivityRequest;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,11 @@ public interface IActivityService {
      * Create a new activity
      */
     ActivityDTO createActivity(CreateActivityRequest request);
+
+    /**
+     * Create a new activity with multipart/form-data
+     */
+    ActivityDTO createActivity(CreateActivityFormRequest request);
     
     /**
      * Get activity by ID
@@ -46,6 +52,11 @@ public interface IActivityService {
      * Update activity
      */
     ActivityDTO updateActivity(String activityId, CreateActivityRequest request);
+
+    /**
+     * Update activity with multipart/form-data
+     */
+    ActivityDTO updateActivity(String activityId, CreateActivityFormRequest request);
     
     /**
      * Delete activity

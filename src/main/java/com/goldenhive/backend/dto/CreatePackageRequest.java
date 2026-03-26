@@ -33,7 +33,7 @@ public class CreatePackageRequest {
     @Schema(description = "Base price", example = "50000")
     private double basePrice;
     
-    @Schema(description = "Package images")
+    @Schema(description = "Package media files (images/videos)")
     private List<ImageDTO> images;
     
     @Schema(description = "Inclusions")

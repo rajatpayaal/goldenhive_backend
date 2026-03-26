@@ -8,12 +8,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Image Data Transfer Object")
+@Schema(description = "Package media data")
 public class ImageDTO {
     
-    @Schema(description = "Image URL", example = "https://example.com/image.jpg")
+    @Schema(description = "Media URL", example = "https://example.com/media.jpg")
     private String url;
     
-    @Schema(description = "Is primary image", example = "true")
+    @Schema(description = "Is primary media", example = "true")
     private boolean isPrimary;
 }

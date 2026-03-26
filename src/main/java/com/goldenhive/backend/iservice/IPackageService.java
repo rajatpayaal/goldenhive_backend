@@ -1,6 +1,7 @@
 package com.goldenhive.backend.iservice;
 
 import com.goldenhive.backend.dto.PackageDTO;
+import com.goldenhive.backend.dto.CreatePackageFormRequest;
 import com.goldenhive.backend.dto.CreatePackageRequest;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,11 @@ public interface IPackageService {
      * Create a new package
      */
     PackageDTO createPackage(CreatePackageRequest request);
+
+    /**
+     * Create a new package with multipart/form-data
+     */
+    PackageDTO createPackage(CreatePackageFormRequest request);
     
     /**
      * Get package by ID
@@ -56,6 +62,11 @@ public interface IPackageService {
      * Update package
      */
     PackageDTO updatePackage(String packageId, CreatePackageRequest request);
+
+    /**
+     * Update package with multipart/form-data
+     */
+    PackageDTO updatePackage(String packageId, CreatePackageFormRequest request);
     
     /**
      * Activate/Deactivate package

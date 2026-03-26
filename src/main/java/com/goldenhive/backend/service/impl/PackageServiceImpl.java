@@ -1,6 +1,7 @@
 package com.goldenhive.backend.service.impl;
 
 import com.goldenhive.backend.dto.PackageDTO;
+import com.goldenhive.backend.dto.CreatePackageFormRequest;
 import com.goldenhive.backend.dto.CreatePackageRequest;
 import com.goldenhive.backend.dto.ImageDTO;
 import com.goldenhive.backend.dto.ItineraryDayDTO;
@@ -10,12 +11,15 @@ import com.goldenhive.backend.entity.Image;
 import com.goldenhive.backend.entity.ItineraryDay;
 import com.goldenhive.backend.entity.Meta;
 import com.goldenhive.backend.enums.PackageStatus;
+import com.goldenhive.backend.helper.PackageFormDataHelper;
+import com.goldenhive.backend.helper.S3FileUploadHelper;
 import com.goldenhive.backend.iservice.IPackageService;
 import com.goldenhive.backend.repository.PackageRepository;
 import com.goldenhive.backend.util.SlugUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +31,8 @@ import java.util.stream.Collectors;
 public class PackageServiceImpl implements IPackageService {
     
     private final PackageRepository packageRepository;
+    private final S3FileUploadHelper s3FileUploadHelper;
+    private final PackageFormDataHelper packageFormDataHelper;
     
     @Override
     public PackageDTO createPackage(CreatePackageRequest request) {
@@ -60,6 +66,13 @@ public class PackageServiceImpl implements IPackageService {
         log.info("Package created with slug: {}", slug);
         
         return mapToDTO(savedPackage);
+    }
+
+    @Override
+    public PackageDTO createPackage(CreatePackageFormRequest request) {
+        List<String> imageUrls = s3FileUploadHelper.uploadFiles(request.getImages(), "packages");
+        CreatePackageRequest packageRequest = packageFormDataHelper.toCreatePackageRequest(request, imageUrls);
+        return createPackage(packageRequest);
     }
     
     @Override
@@ -154,6 +167,19 @@ public class PackageServiceImpl implements IPackageService {
         log.info("Package updated with ID: {}", packageId);
         
         return mapToDTO(updatedPackage);
+    }
+
+    @Override
+    public PackageDTO updatePackage(String packageId, CreatePackageFormRequest request) {
+        Package existingPackage = packageRepository.findById(packageId)
+                .orElseThrow(() -> new RuntimeException("Package not found with ID: " + packageId));
+
+        List<String> imageUrls = s3FileUploadHelper.uploadFiles(request.getImages(), "packages");
+        CreatePackageRequest packageRequest = packageFormDataHelper.toCreatePackageRequest(request, imageUrls);
+        if (imageUrls.isEmpty()) {
+            packageRequest.setImages(mapImageEntityToDTO(existingPackage.getImages()));
+        }
+        return updatePackage(packageId, packageRequest);
     }
     
     @Override
