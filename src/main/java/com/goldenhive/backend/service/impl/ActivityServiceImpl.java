@@ -1,13 +1,17 @@
 package com.goldenhive.backend.service.impl;
 
 import com.goldenhive.backend.dto.ActivityDTO;
+import com.goldenhive.backend.dto.CreateActivityFormRequest;
 import com.goldenhive.backend.dto.CreateActivityRequest;
 import com.goldenhive.backend.entity.Activity;
+import com.goldenhive.backend.helper.ActivityFormDataHelper;
+import com.goldenhive.backend.helper.S3FileUploadHelper;
 import com.goldenhive.backend.iservice.IActivityService;
 import com.goldenhive.backend.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +23,8 @@ import java.util.stream.Collectors;
 public class ActivityServiceImpl implements IActivityService {
     
     private final ActivityRepository activityRepository;
+    private final S3FileUploadHelper s3FileUploadHelper;
+    private final ActivityFormDataHelper activityFormDataHelper;
     
     @Override
     public ActivityDTO createActivity(CreateActivityRequest request) {
@@ -38,6 +44,13 @@ public class ActivityServiceImpl implements IActivityService {
         log.info("Activity created with ID: {}", savedActivity.getActivityId());
         
         return mapToDTO(savedActivity);
+    }
+
+    @Override
+    public ActivityDTO createActivity(CreateActivityFormRequest request) {
+        List<String> imageUrls = s3FileUploadHelper.uploadFiles(request.getImages(), "activities");
+        CreateActivityRequest activityRequest = activityFormDataHelper.toCreateActivityRequest(request, imageUrls);
+        return createActivity(activityRequest);
     }
     
     @Override
@@ -110,6 +123,19 @@ public class ActivityServiceImpl implements IActivityService {
         log.info("Activity updated with ID: {}", activityId);
         
         return mapToDTO(updatedActivity);
+    }
+
+    @Override
+    public ActivityDTO updateActivity(String activityId, CreateActivityFormRequest request) {
+        Activity existingActivity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new RuntimeException("Activity not found with ID: " + activityId));
+
+        List<String> imageUrls = s3FileUploadHelper.uploadFiles(request.getImages(), "activities");
+        CreateActivityRequest activityRequest = activityFormDataHelper.toCreateActivityRequest(request, imageUrls);
+        if (imageUrls.isEmpty()) {
+            activityRequest.setImages(existingActivity.getImages());
+        }
+        return updateActivity(activityId, activityRequest);
     }
     
     @Override

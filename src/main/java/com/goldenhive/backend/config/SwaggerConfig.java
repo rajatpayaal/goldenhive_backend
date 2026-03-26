@@ -1,7 +1,13 @@
 package com.goldenhive.backend.config;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,14 +15,27 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER
+)
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("GoldenHive Travel APIs")
-                        .description("Travel booking API documentation")
+                        .description("Travel booking API documentation. Use /api/auth/login or /api/auth/admin/login to get a JWT, then click Authorize and paste only the raw token value.")
                         .version("1.0"))
+                .components(new Components().addSecuritySchemes("bearerAuth",
+                        new io.swagger.v3.oas.models.security.SecurityScheme()
+                                .type(Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .tags(List.of(
                         new Tag().name("AUTH APIs (4)").description("POST /api/auth/register, POST /api/auth/login, POST /api/auth/admin/login, GET /api/auth/profile"),
                         new Tag().name("PACKAGE APIs (7)").description("Admin and user package endpoints"),

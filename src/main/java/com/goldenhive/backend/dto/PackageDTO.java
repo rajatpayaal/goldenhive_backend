@@ -30,7 +30,7 @@ public class PackageDTO {
     @Schema(description = "Base price", example = "50000")
     private double basePrice;
     
-    @Schema(description = "Package images")
+    @Schema(description = "Package media files (images/videos)")
     private List<ImageDTO> images;
     
     @Schema(description = "Inclusions")
@@ -48,15 +48,15 @@ public class PackageDTO {
     @Schema(description = "Is customizable", example = "true")
     private boolean customizable;
     
-    @Schema(description = "WhatsApp contact number", example = "+919876543210")
+    @Schema(description = "WhatsApp contact")
     private String whatsappContact;
     
-    @Schema(description = "Popular tag", example = "Best Seller")
+    @Schema(description = "Popular tag")
     private String popularTag;
     
-    @Schema(description = "Limited offer", example = "false")
+    @Schema(description = "Limited offer")
     private boolean limitedOffer;
     
-    @Schema(description = "Package metadata")
+    @Schema(description = "Meta information")
     private MetaDTO meta;
 }

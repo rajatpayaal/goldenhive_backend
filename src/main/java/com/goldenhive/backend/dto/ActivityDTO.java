@@ -28,7 +28,7 @@ public class ActivityDTO {
     @Schema(description = "Duration in hours", example = "3")
     private int duration;
     
-    @Schema(description = "Activity images")
+    @Schema(description = "Activity media files (images/videos)")
     private List<String> images;
     
     @Schema(description = "Location", example = "Maldives")
