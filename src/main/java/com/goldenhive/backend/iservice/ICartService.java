@@ -30,7 +30,7 @@ public interface ICartService {
     /**
      * Update cart with new activities
      */
-    CartDTO updateCart(String cartId, List<String> selectedActivityIds);
+    CartDTO updateCart(String cartId, String userId, List<String> selectedActivityIds);
     
     /**
      * Calculate and update total price
@@ -41,7 +41,7 @@ public interface ICartService {
     /**
      * Remove item from cart
      */
-    void removeFromCart(String cartId);
+    void removeFromCart(String cartId, String userId);
     
     /**
      * Clear user's cart

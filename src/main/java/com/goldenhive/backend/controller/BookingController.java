@@ -6,13 +6,20 @@ import com.goldenhive.backend.dto.CreateBookingRequest;
 import com.goldenhive.backend.dto.UpdateBookingStatusRequest;
 import com.goldenhive.backend.enums.BookingStatus;
 import com.goldenhive.backend.exception.NotFoundException;
+import com.goldenhive.backend.iservice.IAuthService;
 import com.goldenhive.backend.iservice.IBookingService;
 import com.goldenhive.backend.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -21,17 +28,19 @@ import java.util.List;
 @Tag(name = "BOOKING APIs (7)", description = "Booking endpoints")
 public class BookingController {
     private final IBookingService bookingService;
+    private final IAuthService authService;
 
     @PostMapping("/api/user/booking/create-from-cart")
     @Operation(summary = "[BOOKING] Create booking from cart")
-    public ApiResponse<BookingDTO> create(@Valid @RequestBody CreateBookingRequest request) {
+    public ApiResponse<BookingDTO> create(@Valid @RequestBody CreateBookingRequest request, Authentication authentication) {
+        request.setUserId(resolveUserId(authentication));
         return ApiResponse.<BookingDTO>builder().success(true).message("Booking created").data(bookingService.createBookingFromCart(request)).build();
     }
 
     @GetMapping("/api/user/booking/my-bookings")
     @Operation(summary = "[BOOKING] List user bookings")
-    public ApiResponse<List<BookingDTO>> myBookings(@RequestParam String userId) {
-        return ApiResponse.<List<BookingDTO>>builder().success(true).message("Bookings fetched").data(bookingService.getUserBookings(userId)).build();
+    public ApiResponse<List<BookingDTO>> myBookings(Authentication authentication) {
+        return ApiResponse.<List<BookingDTO>>builder().success(true).message("Bookings fetched").data(bookingService.getUserBookings(resolveUserId(authentication))).build();
     }
 
     @GetMapping("/api/admin/bookings")
@@ -80,7 +89,8 @@ public class BookingController {
         BookingDTO booking = bookingService.getBookingById(id).orElseThrow(() -> new NotFoundException("Booking not found"));
         return ApiResponse.<List<String>>builder().success(true).message("Booking notes fetched").data(booking.getNotes()).build();
     }
+
+    private String resolveUserId(Authentication authentication) {
+        return authService.loadUserByEmail(authentication.getName()).getUserId();
+    }
 }
-
-
-

@@ -7,7 +7,7 @@
     "basePrice": 34999,
     "images": [
       {
-        "url": "https://example.com/packages/golden-triangle.jpg",
+        "url": "https://goldenhive-prod-assets.s3.ap-south-1.amazonaws.com/packages/images/sample-golden-triangle.jpg",
         "isPrimary": true
       }
     ],

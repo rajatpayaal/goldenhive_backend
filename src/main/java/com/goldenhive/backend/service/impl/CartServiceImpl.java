@@ -5,6 +5,7 @@ import com.goldenhive.backend.dto.AddToCartRequest;
 import com.goldenhive.backend.dto.SelectedActivityDTO;
 import com.goldenhive.backend.entity.Cart;
 import com.goldenhive.backend.entity.SelectedActivity;
+import com.goldenhive.backend.exception.UnauthorizedException;
 import com.goldenhive.backend.iservice.ICartService;
 import com.goldenhive.backend.iservice.IPackageActivityService;
 import com.goldenhive.backend.repository.CartRepository;
@@ -13,6 +14,7 @@ import com.goldenhive.backend.util.PriceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +34,9 @@ public class CartServiceImpl implements ICartService {
     public CartDTO addToCart(AddToCartRequest request) {
         log.info("Adding to cart - User: {}, Package: {}", request.getUserId(), request.getPackageId());
         
-        // Validate package exists
         packageRepository.findById(request.getPackageId())
                 .orElseThrow(() -> new RuntimeException("Package not found with ID: " + request.getPackageId()));
         
-        // Create or update cart
         Cart cart = cartRepository.findByUserIdAndPackageId(request.getUserId(), request.getPackageId())
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
@@ -46,14 +46,12 @@ public class CartServiceImpl implements ICartService {
                     return newCart;
                 });
         
-        // Add selected activities
         List<SelectedActivity> selectedActivities = mapSelectedActivities(
                 request.getPackageId(),
                 request.getSelectedActivityIds()
         );
         cart.setSelectedActivities(selectedActivities);
         
-        // Calculate total price
         double totalPrice = calculateTotalPrice(request.getPackageId(), request.getSelectedActivityIds());
         cart.setTotalPrice(totalPrice);
         
@@ -85,20 +83,19 @@ public class CartServiceImpl implements ICartService {
     }
     
     @Override
-    public CartDTO updateCart(String cartId, List<String> selectedActivityIds) {
+    public CartDTO updateCart(String cartId, String userId, List<String> selectedActivityIds) {
         log.info("Updating cart with ID: {}", cartId);
         
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
+        ensureCartOwner(cart, userId);
         
-        // Update selected activities
         List<SelectedActivity> selectedActivities = mapSelectedActivities(
                 cart.getPackageId(),
                 selectedActivityIds
         );
         cart.setSelectedActivities(selectedActivities);
         
-        // Recalculate total price
         double totalPrice = calculateTotalPrice(cart.getPackageId(), selectedActivityIds);
         cart.setTotalPrice(totalPrice);
         
@@ -108,9 +105,6 @@ public class CartServiceImpl implements ICartService {
         return mapToDTO(updatedCart);
     }
     
-    /**
-     * Calculate total price: basePrice + sum(discountedActivityPrices)
-     */
     @Override
     public double calculateTotalPrice(String packageId, List<String> selectedActivityIds) {
         log.info("Calculating total price - Package: {}, Activities: {}", packageId, selectedActivityIds.size());
@@ -135,12 +129,12 @@ public class CartServiceImpl implements ICartService {
     }
     
     @Override
-    public void removeFromCart(String cartId) {
+    public void removeFromCart(String cartId, String userId) {
         log.info("Removing cart with ID: {}", cartId);
         
-        if (!cartRepository.existsById(cartId)) {
-            throw new RuntimeException("Cart not found with ID: " + cartId);
-        }
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
+        ensureCartOwner(cart, userId);
         
         cartRepository.deleteById(cartId);
         log.info("Cart removed");
@@ -153,9 +147,12 @@ public class CartServiceImpl implements ICartService {
         log.info("All carts cleared for user");
     }
     
-    /**
-     * Map selected activity IDs to SelectedActivity entities with pricing
-     */
+    private void ensureCartOwner(Cart cart, String userId) {
+        if (!cart.getUserId().equals(userId)) {
+            throw new UnauthorizedException("Cart does not belong to this user");
+        }
+    }
+
     private List<SelectedActivity> mapSelectedActivities(String packageId, List<String> activityIds) {
         if (activityIds == null || activityIds.isEmpty()) {
             return new ArrayList<>();
@@ -173,9 +170,6 @@ public class CartServiceImpl implements ICartService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Convert Cart entity to CartDTO
-     */
     private CartDTO mapToDTO(Cart cart) {
         List<SelectedActivityDTO> selectedActivityDTOs = cart.getSelectedActivities() != null ?
                 cart.getSelectedActivities().stream()
