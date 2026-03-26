@@ -2,9 +2,9 @@ package com.goldenhive.backend.factory;
 
 import com.goldenhive.backend.enums.BookingStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Factory;
+import org.springframework.stereotype.Component;
 
-@Factory
+@Component
 @Slf4j
 public class StatusFactory {
     

@@ -36,4 +36,6 @@ public interface CustomRequestRepository extends MongoRepository<CustomRequest, 
      * Find all pending custom requests
      */
     List<CustomRequest> findByStatusOrderByCreatedAtDesc(CustomRequestStatus status);
+
+    List<CustomRequest> findAllByOrderByCreatedAtDesc();
 }

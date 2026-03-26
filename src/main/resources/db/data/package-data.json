@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Golden Triangle Escape",
+    "slug": "golden-triangle-escape",
+    "destination": "Delhi, Agra, Jaipur",
+    "duration": 5,
+    "basePrice": 34999,
+    "images": [
+      {
+        "url": "https://example.com/packages/golden-triangle.jpg",
+        "isPrimary": true
+      }
+    ],
+    "inclusions": ["Hotel stay", "Breakfast", "Airport pickup"],
+    "exclusions": ["Flights", "Personal expenses"],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrival in Delhi",
+        "description": "Check-in and evening city orientation",
+        "location": "Delhi"
+      }
+    ],
+    "highlights": ["Taj Mahal", "Amber Fort"],
+    "customizable": true,
+    "whatsappContact": "+919876543210",
+    "popularTag": "Best Seller",
+    "limitedOffer": true,
+    "meta": {
+      "createdAt": { "$date": "2026-03-26T00:00:00Z" },
+      "updatedAt": { "$date": "2026-03-26T00:00:00Z" },
+      "status": "ACTIVE"
+    }
+  }
+]
