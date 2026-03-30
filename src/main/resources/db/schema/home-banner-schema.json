@@ -1,0 +1,23 @@
+{
+  "collection": "home_banners",
+  "validator": {
+    "$jsonSchema": {
+      "bsonType": "object",
+      "required": ["title", "description", "imageUrl", "altText", "ctaLabel", "ctaLink", "seoTitle", "seoDescription", "displayOrder", "active", "createdAt", "updatedAt"],
+      "properties": {
+        "title": { "bsonType": "string" },
+        "description": { "bsonType": "string" },
+        "imageUrl": { "bsonType": "string" },
+        "altText": { "bsonType": "string" },
+        "ctaLabel": { "bsonType": "string" },
+        "ctaLink": { "bsonType": "string" },
+        "seoTitle": { "bsonType": "string" },
+        "seoDescription": { "bsonType": "string" },
+        "displayOrder": { "bsonType": "int", "minimum": 1 },
+        "active": { "bsonType": "bool" },
+        "createdAt": { "bsonType": "date" },
+        "updatedAt": { "bsonType": "date" }
+      }
+    }
+  }
+}

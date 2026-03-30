@@ -90,6 +90,7 @@ public class SchemaLoader {
             ensureIndexIfMissing("carts", new Document("packageId", 1), new Index().on("packageId", Sort.Direction.ASC));
             ensureIndexIfMissing("package_activity_mappings", new Document("packageId", 1), new Index().on("packageId", Sort.Direction.ASC));
             ensureIndexIfMissing("package_activity_mappings", new Document("activityId", 1), new Index().on("activityId", Sort.Direction.ASC));
+            ensureIndexIfMissing("home_banners", new Document("displayOrder", 1), new Index().on("displayOrder", Sort.Direction.ASC).unique());
 
             log.info("MongoDB indexes ensured successfully");
         } catch (Exception ex) {

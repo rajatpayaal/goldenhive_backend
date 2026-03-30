@@ -48,6 +48,7 @@ public class SwaggerConfig {
                         new Tag().name("NOTIFICATION APIs (1)").description("Admin notification endpoint"),
                         new Tag().name("DASHBOARD APIs (1)").description("Admin dashboard stats endpoint"),
                         new Tag().name("REVIEW APIs (2)").description("Review endpoints"),
+                        new Tag().name("HOME BANNER APIs (6)").description("Admin CRUD and public homepage banner endpoints"),
                         new Tag().name("PDF APIs (1)").description("Booking PDF endpoint")
                 ));
     }

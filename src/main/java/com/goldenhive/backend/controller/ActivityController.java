@@ -31,13 +31,13 @@ public class ActivityController {
     private final IActivityService activityService;
     private final IPackageActivityService packageActivityService;
 
-    @PostMapping(value = "/api/admin/activities", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/admin/add-activities", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "[ACTIVITY] Create activity")
     public ApiResponse<ActivityDTO> create(@Valid @RequestBody CreateActivityRequest request) {
         return ApiResponse.<ActivityDTO>builder().success(true).message("Activity created").data(activityService.createActivity(request)).build();
     }
 
-    @PostMapping(value = "/api/admin/activities", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/admin/add-activities", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "[ACTIVITY] Create activity with multipart/form-data")
     public ApiResponse<ActivityDTO> createWithFormData(@Valid @ModelAttribute CreateActivityFormRequest request) {
         return ApiResponse.<ActivityDTO>builder().success(true).message("Activity created").data(activityService.createActivity(request)).build();
