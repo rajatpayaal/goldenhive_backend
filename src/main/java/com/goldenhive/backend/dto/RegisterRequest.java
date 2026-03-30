@@ -1,6 +1,5 @@
 package com.goldenhive.backend.dto;
 
-import com.goldenhive.backend.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -28,7 +27,4 @@ public class RegisterRequest {
     @NotBlank
     @Schema(example = "Password@123")
     private String password;
-
-    @Schema(example = "USER")
-    private Role role;
 }

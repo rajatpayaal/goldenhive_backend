@@ -4,7 +4,7 @@
     "type": "Sightseeing",
     "price": 2500,
     "duration": 4,
-    "images": ["https://example.com/activities/taj-sunrise.jpg"],
+    "images": ["https://goldenhive-prod-assets.s3.ap-south-1.amazonaws.com/activities/images/sample-taj-sunrise.jpg"],
     "location": "Agra",
     "createdAt": { "$date": "2026-03-26T00:00:00Z" },
     "updatedAt": { "$date": "2026-03-26T00:00:00Z" }

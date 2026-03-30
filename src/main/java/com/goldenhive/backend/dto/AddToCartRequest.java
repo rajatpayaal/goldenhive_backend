@@ -13,8 +13,7 @@ import java.util.List;
 @Schema(description = "Add to Cart Request")
 public class AddToCartRequest {
     
-    @NotBlank(message = "User ID is required")
-    @Schema(description = "User ID", example = "60d5ec49c1234567890abc02")
+    @Schema(description = "Authenticated user ID resolved from token", accessMode = Schema.AccessMode.READ_ONLY)
     private String userId;
     
     @NotBlank(message = "Package ID is required")

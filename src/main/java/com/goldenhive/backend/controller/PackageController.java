@@ -36,7 +36,9 @@ public class PackageController {
 
     @PostMapping(value = "/api/admin/packages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "[PACKAGE] Create package with multipart/form-data")
-    public ApiResponse<PackageDTO> createWithFormData(@Valid @ModelAttribute CreatePackageFormRequest request) {
+    public ApiResponse<PackageDTO> createWithFormData(
+        @Valid @ModelAttribute CreatePackageFormRequest request) {
+
         return ApiResponse.<PackageDTO>builder().success(true).message("Package created").data(packageService.createPackage(request)).build();
     }
 

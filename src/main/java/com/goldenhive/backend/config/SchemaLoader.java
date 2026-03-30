@@ -85,20 +85,33 @@ public class SchemaLoader {
 
     private void createIndexes() {
         try {
-            mongoTemplate.indexOps("packages")
-                    .ensureIndex(new Index().on("slug", Sort.Direction.ASC).unique());
-            mongoTemplate.indexOps("bookings")
-                    .ensureIndex(new Index().on("packageId", Sort.Direction.ASC));
-            mongoTemplate.indexOps("carts")
-                    .ensureIndex(new Index().on("packageId", Sort.Direction.ASC));
-            mongoTemplate.indexOps("package_activity_mappings")
-                    .ensureIndex(new Index().on("packageId", Sort.Direction.ASC));
-            mongoTemplate.indexOps("package_activity_mappings")
-                    .ensureIndex(new Index().on("activityId", Sort.Direction.ASC));
+            ensureIndexIfMissing("packages", new Document("slug", 1), new Index().on("slug", Sort.Direction.ASC).unique());
+            ensureIndexIfMissing("bookings", new Document("packageId", 1), new Index().on("packageId", Sort.Direction.ASC));
+            ensureIndexIfMissing("carts", new Document("packageId", 1), new Index().on("packageId", Sort.Direction.ASC));
+            ensureIndexIfMissing("package_activity_mappings", new Document("packageId", 1), new Index().on("packageId", Sort.Direction.ASC));
+            ensureIndexIfMissing("package_activity_mappings", new Document("activityId", 1), new Index().on("activityId", Sort.Direction.ASC));
+            ensureIndexIfMissing("home_banners", new Document("displayOrder", 1), new Index().on("displayOrder", Sort.Direction.ASC).unique());
 
             log.info("MongoDB indexes ensured successfully");
         } catch (Exception ex) {
             log.error("Failed to create MongoDB indexes", ex);
         }
+    }
+
+    private void ensureIndexIfMissing(String collectionName, Document expectedKey, Index index) {
+        boolean indexExists = mongoTemplate.getCollection(collectionName)
+                .listIndexes()
+                .into(new ArrayList<>())
+                .stream()
+                .map(document -> document.get("key", Document.class))
+                .anyMatch(expectedKey::equals);
+
+        if (indexExists) {
+            log.info("Skipping existing index for collection {} and key {}", collectionName, expectedKey.toJson());
+            return;
+        }
+
+        mongoTemplate.indexOps(collectionName).ensureIndex(index);
+        log.info("Created index for collection {} and key {}", collectionName, expectedKey.toJson());
     }
 }

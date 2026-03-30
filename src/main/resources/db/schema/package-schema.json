@@ -20,12 +20,13 @@
         "duration": { "bsonType": "int", "minimum": 1 },
         "basePrice": { "bsonType": ["double", "int", "long", "decimal"], "minimum": 0 },
         "images": {
+          "description": "Package media URLs with primary flag",
           "bsonType": "array",
           "items": {
             "bsonType": "object",
             "required": ["url", "isPrimary"],
             "properties": {
-              "url": { "bsonType": "string" },
+              "url": { "bsonType": "string", "description": "Image or video URL" },
               "isPrimary": { "bsonType": "bool" }
             }
           }
